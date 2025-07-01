@@ -160,7 +160,7 @@ class BaseTracker(ABC):
         def wrapper(self, dets: np.ndarray, img: np.ndarray, embs: np.ndarray = None):
             # handle different types of inputs
             if dets is None or len(dets) == 0:
-                dets = np.empty((0, 6))
+                dets = np.empty((0, 7))
 
             if not self.per_class:
                 # Process all detections at once if per_class is False

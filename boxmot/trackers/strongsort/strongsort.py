@@ -115,7 +115,7 @@ class StrongSort(object):
         self.tracker.update(detections)
 
         # ===== 新增：ID识别和映射逻辑 =====
-        if target_tracker_id:
+        if len(target_tracker_id) > 0 and target_tracker_id[0] is not None:
             try:
                 # 更新所有确认的轨迹ID为目标trackerID
                 for track in self.tracker.tracks:
@@ -123,7 +123,7 @@ class StrongSort(object):
                         # 保存原始ID用于调试
                         original_id = track.id
                         # 更新轨迹ID
-                        track.id = target_tracker_id
+                        track.id = int(target_tracker_id[0]) if isinstance(target_tracker_id, np.ndarray) else target_tracker_id
                         print(f"Updated track ID: {original_id} -> {target_tracker_id}")
             except Exception as e:
                 print(f"Error in pet ID recognition: {e}")
