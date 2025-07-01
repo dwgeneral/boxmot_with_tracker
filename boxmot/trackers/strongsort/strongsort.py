@@ -65,9 +65,9 @@ class StrongSort(object):
         self.cmc = get_cmc_method("ecc")()
 
     @BaseTracker.per_class_decorator
-    def update(
-        self, dets: np.ndarray, img: np.ndarray, embs: np.ndarray = None
-    ) -> np.ndarray:
+    def update(self, dets: np.ndarray, img: np.ndarray, embs: np.ndarray = None) -> np.ndarray:
+        print(f"------ dets: {dets}")
+
         assert isinstance(
             dets, np.ndarray
         ), f"Unsupported 'dets' input format '{type(dets)}', valid format is np.ndarray"
@@ -78,12 +78,8 @@ class StrongSort(object):
             len(dets.shape) == 2
         ), "Unsupported 'dets' dimensions, valid number of dimensions is two"
         assert (
-            dets.shape[1] == 6
-        ), "Unsupported 'dets' 2nd dimension lenght, valid lenghts is 6"
-        if embs is not None:
-            assert (
-                dets.shape[0] == embs.shape[0]
-            ), "Missmatch between detections and embeddings sizes"
+            dets.shape[1] == 7
+        ), "Unsupported 'dets' 2nd dimension lenght, valid lenghts is 7"
 
         dets = np.hstack([dets, np.arange(len(dets)).reshape(-1, 1)])
         remain_inds = dets[:, 4] >= self.min_conf
@@ -92,7 +88,8 @@ class StrongSort(object):
         xyxy = dets[:, 0:4]
         confs = dets[:, 4]
         clss = dets[:, 5]
-        det_ind = dets[:, 6]
+        target_tracker_id = dets[:, 6] # 新增：目标trackerID
+        det_ind = dets[:, 7]
 
         if len(self.tracker.tracks) >= 1:
             warp_matrix = self.cmc.apply(img, xyxy)
@@ -116,6 +113,23 @@ class StrongSort(object):
         # update tracker
         self.tracker.predict()
         self.tracker.update(detections)
+
+        # ===== 新增：ID识别和映射逻辑 =====
+        if target_tracker_id:
+            try:
+                # 更新所有确认的轨迹ID为目标trackerID
+                for track in self.tracker.tracks:
+                    if track.is_confirmed() and track.time_since_update < 1:
+                        # 保存原始ID用于调试
+                        original_id = track.id
+                        # 更新轨迹ID
+                        track.id = target_tracker_id
+                        print(f"Updated track ID: {original_id} -> {target_tracker_id}")
+            except Exception as e:
+                print(f"Error in pet ID recognition: {e}")
+                # 如果ID识别失败，继续使用原有的跟踪逻辑
+                pass
+        # ===== ID识别逻辑结束 =====
 
         # output bbox identities
         outputs = []

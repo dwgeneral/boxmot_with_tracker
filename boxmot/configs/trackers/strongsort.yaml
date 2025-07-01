@@ -1,39 +1,87 @@
+# min_conf:
+#   type: uniform
+#   default: 0.6  # from the default parameters
+#   range: [0.2, 0.8]
+
+# ema_alpha:
+#   type: uniform
+#   default: 0.9  # from the default parameters
+#   range: [0.7, 0.95]
+
+# max_cos_dist:
+#   type: uniform
+#   default: 0.4  # from the default parameters
+#   range: [0.1, 0.4]
+
+# max_iou_dist:
+#   type: uniform
+#   default: 0.7  # from the default parameters
+#   range: [0.5, 0.95]
+
+# max_age:
+#   type: randint
+#   default: 30  # from the default parameters
+#   range: [10, 151]  # upper bound exclusive
+
+# n_init:
+#   type: randint
+#   default: 3  # from the default parameters
+#   range: [1, 4]  # upper bound exclusive
+
+# mc_lambda:
+#   type: uniform
+#   default: 0.98  # from the default parameters
+#   range: [0.90, 0.999]
+
+# nn_budget:
+#   type: choice
+#   default: 100  # from the default parameters
+#   options: [100]
+
 min_conf:
   type: uniform
-  default: 0.6  # from the default parameters
+  default: 0.25  # 可根据实际需求调整
   range: [0.2, 0.8]
+  # - **通俗理解**：只相信“把握大”的目标，过滤掉模型不自信的检测结果。
 
 ema_alpha:
   type: uniform
-  default: 0.9  # from the default parameters
+  default: 0.9
   range: [0.7, 0.95]
+  # - **通俗理解**：跟踪时，目标的“外观特征”会随时间平滑更新，这个值越大，越“相信历史”，越小越“相信新帧”。
 
 max_cos_dist:
   type: uniform
-  default: 0.4  # from the default parameters
+  default: 0.3  # 可根据实际需求调整
   range: [0.1, 0.4]
+  # - **通俗理解**：越小，只有非常像的目标才会被认为是同一个；越大，容易误把不同目标当成同一个。
 
 max_iou_dist:
   type: uniform
-  default: 0.7  # from the default parameters
+  default: 0.9  # 可根据实际需求调整
   range: [0.5, 0.95]
+  # - **通俗理解**：越大，允许目标框有较大偏移还认为是同一个目标；越小，只有高度重叠才算同一个。
 
 max_age:
   type: randint
-  default: 30  # from the default parameters
-  range: [10, 151]  # upper bound exclusive
+  default: 150  # 可根据实际需求调整
+  range: [10, 151]
+  # - **通俗理解**：目标“消失”后还能被“记住”多少帧，太大容易误跟踪，太小容易丢目标。
 
 n_init:
   type: randint
-  default: 3  # from the default parameters
-  range: [1, 4]  # upper bound exclusive
+  default: 30
+  range: [1, 30]
+  # - **通俗理解**：防止偶然误检，只有连续多帧都检测到才算“真的有新目标”。
 
 mc_lambda:
   type: uniform
-  default: 0.98  # from the default parameters
+  default: 0.98
   range: [0.90, 0.999]
+  # - **通俗理解**：控制轨迹平滑程度，越大越平滑，越小越灵敏。
 
 nn_budget:
   type: choice
-  default: 100  # from the default parameters
-  options: [100]
+  default: 150  # 可根据实际需求调整
+  options: [100, 150, 200] 
+  # - **通俗理解**：每个目标最多“记住”多少帧的外观特征，太大占内存，太小容易丢失历史信息。
