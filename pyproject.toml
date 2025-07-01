@@ -71,7 +71,7 @@ build-backend = "hatchling.build"
 ###########
 
 [project]
-name            = "boxmot"
+name            = "boxmot_with_tracker"
 version         = "13.0.13"
 description     = "BoxMOT: pluggable SOTA tracking modules for segmentation, object detection and pose estimation models"
 readme          = "README.md"
@@ -79,7 +79,7 @@ requires-python = ">=3.9,<=3.13"
 license         = { text = "AGPL-3.0" }
 
 authors = [
-  { name = "Mikel Broström" },
+  { name = "Wind Guo" },
 ]
 
 classifiers = [
@@ -136,6 +136,9 @@ dependencies = [
 
 [project.scripts]
 boxmot = "boxmot.engine.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["boxmot"]
 
 #####################
 # Dependency Groups #
