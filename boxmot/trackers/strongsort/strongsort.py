@@ -115,7 +115,7 @@ class StrongSort(object):
         self.tracker.update(detections)
 
         # ===== 新增：ID识别和映射逻辑 =====
-        if len(target_tracker_id) > 0 and target_tracker_id[0] is not None:
+        if len(target_tracker_id) > 0 and target_tracker_id[0] > 0:
             try:
                 # 更新所有确认的轨迹ID为目标trackerID
                 for track in self.tracker.tracks:
@@ -145,9 +145,7 @@ class StrongSort(object):
             det_ind = track.det_ind
 
             outputs.append(
-                np.concatenate(
-                    ([x1, y1, x2, y2], [id], [conf], [cls], [det_ind])
-                ).reshape(1, -1)
+                np.array([*track.to_tlbr(), id, conf, cls, det_ind]).reshape(1, -1)
             )
         if len(outputs) > 0:
             return np.concatenate(outputs)
